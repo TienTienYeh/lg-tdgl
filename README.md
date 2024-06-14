@@ -1,6 +1,6 @@
 # LG-TDGL
 
-![pyTDGL Logo](docs/images/logo-transparent-small.png)
+![pyTDGL Logo](docs/fig_abstract.pdf)
 
 Time-dependent Ginzburg-Landau in Python
 
