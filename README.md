@@ -15,7 +15,16 @@ Time-dependent Ginzburg-Landau in Python
 
 
 ## Motivation
-`pyTDGL` solves a 2D generalized time-dependent Ginzburg-Landau (TDGL) equation, enabling simulations of vortex and phase dynamics in thin film superconducting devices.
+
+`LG-TDGL` provides the platform to solve the light-matter interaction between structured light and supercinducting order parameters. The solving order parameters is based on the framework of "generalized time-depdendent Ginzburg-Landau (TDGL) equation" in `pyTDGL`*. <br>
+The work "Structured light induced vorticity in superconductors I: Linearly polarized light"** is based on the calculation of `LG-TDGL`. <br>
+In this notebook, we provide an example of linearly polarized light induced vortex and demonstrate the results for the light imprinted superflow***.
+
+*Link of `pyTDGL`: https://py-tdgl.readthedocs.io/en/latest/ <br>
+  This code has to be executed under the environment of `pyTDGL`.
+**DOI:xxxxxxxxxxxxxxxxxxxxx. <br>
+***This figure is corresponds to Fig. 5 in reference "xxxxxxxxxxxxxxx".
+
 
 ## Learn `pyTDGL`
 
