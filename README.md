@@ -59,7 +59,7 @@ pip install -e ".[dev,docs]"
 
 >* Structured light induced vorticity in superconductors I: Linearly polarized light (unpublished)
 
-If you use `pyTDGL` in your research, please cite the paper linked above.
+If you use `LG-TDGL` in your research, please cite the paper linked above.
 
     % BibTeX citation
     @article{
