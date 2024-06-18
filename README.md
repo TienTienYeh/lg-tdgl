@@ -11,7 +11,7 @@ Time-dependent Ginzburg-Landau in Python
 ![GitHub](https://img.shields.io/github/license/loganbvh/py-tdgl)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![DOI](https://zenodo.org/badge/535746543.svg)](https://zenodo.org/badge/latestdoi/535746543)
-
+### Check with Avinaash for meaning of icons
 
 
 ## Motivation
@@ -25,52 +25,33 @@ In this notebook, we provide an example of linearly polarized light induced vort
 **DOI:xxxxxxxxxxxxxxxxxxxxx. <br>
 ***This figure is corresponds to Fig. 5 in reference "xxxxxxxxxxxxxxx".
 
-
-## Learn `pyTDGL`
-
-The documentation for `pyTDGL` can be found at [py-tdgl.readthedocs.io](https://py-tdgl.readthedocs.io/en/latest/).
-
-## Try `pyTDGL`
+## Try `LG-TDGL`
 
 Click the badge below to try `pyTDGL` interactively online via [Google Colab](https://colab.research.google.com/):
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/loganbvh/py-tdgl/blob/main/docs/notebooks/quickstart.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/TienTienYeh/lg-tdgl/blob/main/docs/quickstart.ipynb)
 
-## Install `pyTDGL`
-
-`pyTDGL` requires `python` `3.8`, `3.9`, `3.10`, or `3.11`. We recommend installing `pyTDGL` in a [`conda` environment](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html), e.g.
-
-```bash
-conda create --name tdgl python="3.10"
-conda activate tdgl
-```
 
 ### Install via `pip`
 
-From  [PyPI](https://pypi.org/project/tdgl/), the Python Package index:
-    
-```bash
-pip install tdgl
-```
-
-From this [GitHub repository](https://github.com/loganbvh/py-tdgl/):
+From this [GitHub repository](https://github.com/TienTienYeh/lg-tdgl/):
 
 ```bash
-pip install git+https://github.com/loganbvh/py-tdgl.git
+pip install git+https://github.com/TienTienYeh/lg-tdgl.git
 ```
 
 Editable installation:
 
 ```bash
-git clone https://github.com/loganbvh/py-tdgl.git
-cd py-tdgl
+git clone https://github.com/TienTienYeh/lg-tdgl.git
+cd lg-tdgl
 pip install -e ".[dev,docs]"
 ```
 ## About `pyTDGL`
 
 ### Authors
 
-- Primary author and maintainer: [@TienTienYeh](https://github.com/loganbvh/).
+- Primary author and maintainer: [@TienTienYeh](https://github.com/TienTienYeh/).
 
 ### Citing `pyTDGL`
 
@@ -90,4 +71,14 @@ If you use `pyTDGL` in your research, please cite the paper linked above.
 
 This work is based on the `pyTDGL` developed by Logan Bishop-Van Horn.
 The documentation for `pyTDGL` can be found at [py-tdgl.readthedocs.io](https://py-tdgl.readthedocs.io/en/latest/).
+
+(Install `pyTDGL`)
+
+`pyTDGL` requires `python` `3.8`, `3.9`, `3.10`, or `3.11`. We recommend installing `pyTDGL` in a [`conda` environment](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html), e.g.
+
+```bash
+conda create --name tdgl python="3.10"
+conda activate tdgl
+```
+
 
