@@ -83,7 +83,6 @@ CLASSIFIERS = [
 PLATFORMS = ["Linux", "Mac OSX", "Unix", "Windows"]
 KEYWORDS = "superconductor vortex Ginzburg-Landau Laguerre Gaussian Light"
 
-exec(open("tdgl/version.py").read())
 
 setup(
     name=NAME,
