@@ -86,7 +86,6 @@ KEYWORDS = "superconductor vortex Ginzburg-Landau Laguerre Gaussian Light"
 
 setup(
     name=NAME,
-    version=__version__,  # noqa: F821
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
     url=URL,
