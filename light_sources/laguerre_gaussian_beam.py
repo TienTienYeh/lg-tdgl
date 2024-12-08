@@ -1,18 +1,18 @@
-import logging
-import os
-import shutil
-from contextlib import nullcontext
-from logging import Logger
+# import logging
+# import os
+# import shutil
+# from contextlib import nullcontext
+# from logging import Logger
 from typing import Any, Dict, Literal, Optional, Sequence, Tuple, Union
 
-from matplotlib import animation
+# from matplotlib import animation
 from matplotlib import pyplot as plt
-from tqdm import tqdm
+# from tqdm import tqdm
 
-from tdgl.device.device import Device
-from tdgl.solution.data import get_data_range
-from tdgl.visualization.common import DEFAULT_QUANTITIES, PLOT_DEFAULTS, Quantity, auto_grid
-from tdgl.visualization.io import get_plot_data, get_state_string
+# from tdgl.device.device import Device
+# from tdgl.solution.data import get_data_range
+# from tdgl.visualization.common import DEFAULT_QUANTITIES, PLOT_DEFAULTS, Quantity, auto_grid
+# from tdgl.visualization.io import get_plot_data, get_state_string
 
 ### LG beam
 
@@ -77,6 +77,14 @@ def findval(X,x_value):
 
 ### A of LG beam (equip the functions of "Step structured Bz" and "constant uniform Bz")
 
+def Cpl(p,l):
+  if abs(p)==0: p=1
+  factorial_p = 1
+  factorial_pl = 1
+  for i in range(abs(int(p))): factorial_p = factorial_p*(i+1)
+  for i in range(abs(int(p))+abs(int(l))): factorial_pl = factorial_pl*(i+1)
+  return np.sqrt(2*factorial_p/np.pi/factorial_pl)
+
 def A_LG_t(x, y, z, *, t,
                    w: float = 1.0,
                    E0: float = 1.0,
@@ -88,8 +96,8 @@ def A_LG_t(x, y, z, *, t,
                    phi0_t: float = 0,
                    phi0_xy: float = 0,
                    tau: float = 1.0,
-                   p: float = 0.0,
-                   l: float = 0.0,
+                   p: int = 0.0,
+                   l: int = 0.0,
                    s: float = 0.0,
                    c: float = 1.0,
                    t_on: float = 0.0,
@@ -122,10 +130,15 @@ def A_LG_t(x, y, z, *, t,
 
     r = np.sqrt(X**2+Y**2)   # Radius
     phi = np.angle(X+1j*Y)   # Azimuthal angle
+    if polarization.lower()=='x' or polarization.lower()=='linear x': s, phi0_xy = [0.0,0.0]
+    if polarization.lower()=='y' or polarization.lower()=='linear y': s, phi0_xy = [0.0,np.pi/2]
+    if polarization.lower()=='lc' or polarization.lower()=='left circular': s, phi0_xy = [1,np.pi/4]
+    if polarization.lower()=='rc' or polarization.lower()=='right circular': s, phi0_xy = [-1,np.pi/4]
     phi_t = np.copy(phi0_t) # ONLY CONSTANT PHASE REMAINS if time_evolute==False
     if time_evolute: phi_t = phi_t + w*ti
     phiGouy = (2*p+np.abs(l)+1)*np.arctan(Z/zR) # Gouy phase
-    u = E0 * w0/wz * np.exp(-r**2/wz**2 -1j*phiGouy +1j*(l*phi +k*z +k*r**2/2/(z-1j*zR)))
+    u = E0 * Cpl(p,l)/w0 * (np.sqrt(2)*r/wz)**l * genlaguerre(p,l)(2*r**2/wz**2) * w0/wz * np.exp(-1j*phiGouy +1j*(l*phi +k*z +k*r**2/2/(z-1j*zR)))
+
 
     if t>t_off or t<t_on: t_step = 0
     else: t_step = 1
@@ -162,8 +175,8 @@ def A_LG(*,
         phi0_xy: float = 0,
         tau: float = 1.0,
         c: float = 1.0,
-        p: float = 0.0,
-        l: float = 0.0,
+        p: int = 0.0,
+        l: int = 0.0,
         s: float = 0.0,
         t_on: float = 0.0,
         t_off: float = 1.0,
@@ -288,6 +301,10 @@ def E_LG_t(x, y, z, *, t,
 
     r = np.sqrt(X**2+Y**2)   # Radius
     phi = np.angle(X+1j*Y)   # Azimuthal angle
+    if polarization.lower()=='x' or polarization.lower()=='linear x': s, phi0_xy = [0.0,0.0]
+    if polarization.lower()=='y' or polarization.lower()=='linear y': s, phi0_xy = [0.0,np.pi/2]
+    if polarization.lower()=='lc' or polarization.lower()=='left circular': s, phi0_xy = [1,np.pi/4]
+    if polarization.lower()=='rc' or polarization.lower()=='right circular': s, phi0_xy = [-1,np.pi/4]
     phi_t = np.copy(phi0_t) # ONLY CONSTANT PHASE REMAINS if time_evolute==False
     if time_evolute: phi_t = phi_t + w*ti
     phiGouy = (2*p+np.abs(l)+1)*np.arctan(Z/zR) # Gouy phase
@@ -327,33 +344,39 @@ def E2Bv(xv,yv,Ex,Ey,Bz_constant,c,w):
     # B = np.stack([np.real(Bx), np.real(By), np.real(Bz)], axis=1)
     return Bx, By, Bz #.to(f"{field_units}").magnitude
 
-def find_max_Bz(Xv,Yv,E0i,constant_Bz,c,w):
-    Ex, Ey = E_input_frame(Xv,Yv,0,take_real=False)
-    Bx, By, Bz1 = E2Bv(Xv,Yv,E0i*Ex,E0i*Ey,0,c,w)
-    Ex, Ey = E_input_frame(Xv,Yv,2*np.pi/4/w,take_real=False)
-    Bx, By, Bz2 = E2Bv(Xv,Yv,E0i*Ex,E0i*Ey,0,c,w)
-    Ex, Ey = E_input_frame(Xv,Yv,2*np.pi/2/w,take_real=False)
-    Bx, By, Bz3 = E2Bv(Xv,Yv,E0i*Ex,E0i*Ey,0,c,w)
-    return max([abs(np.real(Bz1)).max(), abs(np.real(Bz2)).max(), abs(np.real(Bz3)).max()]) + constant_Bz
+def find_max_Bz(P):
+    Ex, Ey = P.E_input_frame(0,take_real=False)
+    Bx, By, Bz1 = E2Bv(P.Xv,P.Yv,P.E0i*Ex,P.E0i*Ey,0,P.c,P.w_GL)
+    Ex, Ey = P.E_input_frame(2*np.pi/4/P.w_GL,take_real=False)
+    Bx, By, Bz2 = E2Bv(P.Xv,P.Yv,P.E0i*Ex,P.E0i*Ey,0,P.c,P.w_GL)
+    Ex, Ey = P.E_input_frame(2*np.pi/2/P.w_GL,take_real=False)
+    Bx, By, Bz3 = E2Bv(P.Xv,P.Yv,P.E0i*Ex,P.E0i*Ey,0,P.c,P.w_GL)
+    return max([abs(np.real(Bz1)).max(), abs(np.real(Bz2)).max(), abs(np.real(Bz3)).max()]) + P.constant_Bz
 
 
 ### ------------------------------------------------------------------------------------------ ###
 
 ### Other useful functions
 
-def light_state_control_LinearGauss(keyword_of_state):
+def light_state_control_LaguerreGauss(*,keyword_of_state="None"):
 
     ''' Select the parameters for optical states
-    options: 'linear_x','linear_y'
+    options: 'lg00_l_x','lg00_l_y','lg00_c_l','lg00_c_r','lg01_l_x','lg24_l_y',etc.
+    return p, l, s, phi0_t, phi0_xy, polarization_modulation, output_file_head
     '''
-
-    ## Linear polatization, Gauss:  for linear polarization, phi0_xy could be any number and s=0
-    if keyword_of_state.lower()=='linear_x': phi0_t, phi0_xy, polarization_modulation, output_file_head = [0,0, False,'Gauss_linear_x']
-    if keyword_of_state.lower()=='linear_y': phi0_t, phi0_xy, polarization_modulation, output_file_head = [0,np.pi/2, False,'Gauss_linear_y']
-    if keyword_of_state.lower()=='x': phi0_t, phi0_xy, polarization_modulation, output_file_head = [0,0, False,'Gauss_linear_x']
-    if keyword_of_state.lower()=='y': phi0_t, phi0_xy, polarization_modulation, output_file_head = [0,np.pi/2, False,'Gauss_linear_y']
-
-    return phi0_t, phi0_xy, polarization_modulation, output_file_head
+    if keyword_of_state[:2].lower()!='lg': keyword_of_state = 'None'
+    if keyword_of_state=='None': 
+        output_file_head = 'LGbeam'
+        return 0, 0, 0, 0, 0, False, 'Gaussian_beam_linear_x'
+    else:
+        p = int(keyword_of_state[2])
+        l = int(keyword_of_state[3])
+        if keyword_of_state[-1].lower()=='x': s, phi0_t, phi0_xy, polarization_modulation, output_file_head_suffix = [0,0,0, False,'_linear_x']
+        if keyword_of_state[-1].lower()=='y': s, phi0_t, phi0_xy, polarization_modulation, output_file_head_suffix = [0,0,np.pi/2, False,'_linear_y']
+        if keyword_of_state[-1].lower()=='l': s, phi0_t, phi0_xy, polarization_modulation, output_file_head_suffix = [1,0,np.pi/4, False,'_circular_l']
+        if keyword_of_state[-1].lower()=='r': s, phi0_t, phi0_xy, polarization_modulation, output_file_head_suffix = [-1,0,np.pi/4, False,'_circular_r']
+        output_file_head = 'LG'+str(p)+str(l)+output_file_head_suffix
+        return p, l, s, phi0_t, phi0_xy, polarization_modulation, output_file_head
 
 class input_value:
     def __init__(self,*,
@@ -379,13 +402,16 @@ class input_value:
                 temperature: float = 0.5, # Temperature of SC (Unit of Tc)
                 resistivity: float = 150e-6, # Resistivity of normal state
             # [EM] Properties of EM wave
-                E_amp: float = 200, # Input amplitude of electric field
+                E_amp: float = 200, # Input amplitude of electric field (unit: A0*w_EM)
                 w_EM: float = -1, # Angular frequency of light (choose one "w_EM" "f_EM" which >=0)
                 f_EM: float = -1, # Frequency of light (choose one "w_EM" "f_EM" which >=0)
                 w_0: float = 0.4,# Radius of spot of Gaussian beam
                 xc_Gauss: float = 0.0, # Center position of Gaussian beam
                 yc_Gauss: float = 0.0, # Center position of Gaussian beam
                 light_source_type: str = 'None', # Setting of light source (autometically setting with keywords "linear_x", "linear_y", "x" , or "y")
+                p: int = 0, # Quantum number of radial order: p
+                l: int = 0, # Quantum number of orbital angular momentum: l
+                s = 0, # Quantum number of spin angular momentum: s
             # [EM] Details of phase
                 phi0_t: float = 0.0, # Phase shift of time, i.e. w*t +　phi0_t
                 phi0_xy: float = 0.0, # Ａngle shift of polarization, e.g. 0:'x-pol', and pi/2:'y-pol'
@@ -429,7 +455,7 @@ class input_value:
         lambdaL_eff = lambdaL**2/d_thickness
     # [SC] Size of sample
         self.temperature = temperature # Unit of Tc
-        self.disorder_epsilon = 1/temperature-1 # Updated value
+        self.disorder_epsilon = 1 # Originally, the value in pytdgl is 1/temperature-1. Here we fixed it as 1 and change the unit as temperature dependent dimentions.
     # [SC] onductivity of sample
         self.resistivity = resistivity
         rn_resistivity = resistivity* ureg(resistivity_units)
@@ -475,29 +501,35 @@ class input_value:
         self.tau_EM_unit = self.tau_EM * self.tau_GL
     # [EM] Fundamental properties
         B0_EM = (1/self.c) * ureg(field_units) # Output value to TDGL detedmined by unit
-        A0_EM = (1/self.w_EM) * ureg(f"{field_units} * {length_units}") # Output value to TDGL detedmined by unit
+        A0_EM = (1/self.w_GL) * ureg(f"{field_units} * {length_units}") # Output value to TDGL detedmined by unit
         E0_EM = B0_EM * speed_of_light # Output value to TDGL detedmined by unit
-        self.E_amp = E_amp # Input amplitude of electric field
-        E0i = E_amp/(E0_EM.to(E_field_units)).magnitude # From E_amp with "E_field_units" to unitless TDGL
-        self.E0i = E0i # Updated value
+        self.E0_GL = self.A0 * self.f_GL * ureg('1/'+time_units) # Output value to TDGL detedmined by unit
+        self.E0 = (E_amp * self.E0_GL).to(E_field_units) # Input amplitude of electric field
+        self.E_amp = E_amp
+        # E0i = (self.E_amp/E0_EM.to(E_field_units)).magnitude # From E_amp with "E_field_units" to unitless TDGL
+        self.E0i = E_amp # Updated value
         # * ureg("1/angular_freq_units").to("time_units").magnitude
         self.lambda_EM = (speed_of_light * self.tau_EM_unit * ureg(time_units).to("s")).to(length_units).magnitude
         self.w_0 = w_0 # Radius of spot of Gaussian beam
         self.xc_Gauss = xc_Gauss # Center position of Gaussian beam
         self.yc_Gauss = yc_Gauss # Center position of Gaussian beam
         self.light_source_type = light_source_type # Setting of light source (autometically setting with keywords "linear_x", "linear_y", "x" , or "y")
-        self.B_EM_inplane = E0i*B0_EM
-        self.A_EM_inplane = E0i*A0_EM
+        self.B_EM_inplane = self.E0i*B0_EM
+        self.A_EM_inplane = self.E0i*A0_EM
         self.phi0_t = phi0_t # Phase shift of time, i.e. w*t +　phi0_t
         self.phi0_xy = phi0_xy # Ａngle shift of polarization, e.g. 0:'x-pol', and pi/2:'y-pol'
         self.polarization_modulation = polarization_modulation
         self.t_on, self.t_off, self.time_evolute = [0, solve_time, 'True']
-        self.p = 0
-        self.l = 0
-        self.s = 0
-        keyword_list = ['linear_x', 'linear_y', 'x', 'y']
-        if light_source_type.lower() in keyword_list:
-            phi0_t, phi0_xy, polarization_modulation, output_file_head = light_state_control_LinearGauss(light_source_type)
+        self.p = p
+        self.l = l
+        self.s = s
+        self.light_source_type = light_source_type
+        keyword_list = ['_l_x','_l_y','_c_r','_c_l']
+        if light_source_type[:2].lower()=='lg' and light_source_type[-4:].lower() in keyword_list:
+            p, l, s, phi0_t, phi0_xy, polarization_modulation, output_file_head = light_state_control_LaguerreGauss(keyword_of_state=light_source_type)
+            self.p = p
+            self.l = l
+            self.s = s
             self.phi0_t = phi0_t
             self.phi0_xy = phi0_xy
             self.polarization_modulation = polarization_modulation
@@ -518,6 +550,7 @@ class input_value:
         self.Xv = Xv
         self.Yv = Yv
         self.Zv = Zv
+
         def E_input_frame(self, ti,*,take_real: bool=True):
             Zv = np.zeros_like(self.Xv)
             Ex, Ey, Ez =  (E_LG_t(self.Xv, self.Yv, self.Zv, t=ti, w=self.w_EM, w0=self.w_0, E0=self.E0i, xc_Gauss=self.xc_Gauss, yc_Gauss=self.yc_Gauss,
@@ -525,8 +558,8 @@ class input_value:
                                      tau=self.tau, polarization_modulation=self.polarization_modulation,
                                      t_on=self.t_on, t_off=self.t_off, Bz=self.constant_Bz, time_evolute=self.time_evolute,
                                      angular_freq_units=self.angular_freq_units, length_units=self.length_units, E_field_units=self.E_field_units, time_units=self.time_units,))
-            if take_real: return np.real(Ex)/E0i, np.real(Ey)/E0i
-            else:         return Ex/E0i, Ey/E0i
+            if take_real: return np.real(Ex)/self.E0i, np.real(Ey)/self.E0i
+            else:         return Ex/self.E0i, Ey/self.E0i
         def find_max_Bz(self):
             Ex, Ey = E_input_frame(self,0,take_real=False)
             Bx, By, Bz1 = E2Bv(self.Xv,self.Yv,self.E0i*Ex,self.E0i*Ey,0,self.c,self.w_EM)
@@ -576,22 +609,23 @@ class input_value:
         if PrintAll: print(" ")
         if PrintAll: print("[6] Parameters of light source")
         if 'w_0' in kwargs_list or PrintAll: print("Beam size (2w0): "+str(2*self.w_0 * ureg(self.length_units)))
-        if 'lambda_EM' in kwargs_list or PrintAll: print("Wavelength: "+str(self.lambda_EM * ureg(self.length_units)))
-        if 'w_EM' in kwargs_list or PrintAll: print("Angular frequency of light (w, unit of 1/tau_GL): "+str(self.w_EM))
-        if 'w_EM_unit' in kwargs_list or PrintAll: print("Angular frequency of light (w, value with unit): "+str((self.w_EM_unit) * ureg('1/'+self.time_units).to(self.angular_freq_units)))
-        if 'f_EM' in kwargs_list or PrintAll: print("Frequency of light (w/2pi, unit of tau_GL): "+str(self.f_EM))
-        if 'f_EM_unit' in kwargs_list or PrintAll: print("Frequency of light (w/2pi, real value with unit): "+str((self.f_EM_unit) * ureg('1/'+self.time_units).to(self.angular_freq_units)))
-        if 'E_amp' in kwargs_list or PrintAll: print("|E0| of light: "+str(self.E_amp * ureg(self.E_field_units)))
-        if 'E0i' in kwargs_list or PrintAll: print("Value of dimentionless |E0|: "+str(self.E0i))
-        if 'B_EM_inplane' in kwargs_list or PrintAll: print("In-plane |B0| of light (|E0|/c): "+str(self.B_EM_inplane))
-        if 'A_EM_inplane' in kwargs_list or PrintAll: print("In-plane |A0| of light (|E0|/w): "+str(self.A_EM_inplane))
+        if 'lambda_em' in kwargs_list or PrintAll: print("Wavelength: "+str(self.lambda_EM * ureg(self.length_units)))
+        if 'w_em' in kwargs_list or PrintAll: print("Angular frequency of light (w, unit of 1/tau_GL): "+str(self.w_EM))
+        if 'w_em_unit' in kwargs_list or PrintAll: print("Angular frequency of light (w, value with unit): "+str((self.w_EM_unit) * ureg('1/'+self.time_units).to(self.angular_freq_units)))
+        if 'f_em' in kwargs_list or PrintAll: print("Frequency of light (w/2pi, unit of tau_GL): "+str(self.f_EM))
+        if 'f_em_unit' in kwargs_list or PrintAll: print("Frequency of light (w/2pi, real value with unit): "+str((self.f_EM_unit) * ureg('1/'+self.time_units).to(self.angular_freq_units)))
+        if 'e0_gl' in kwargs_list or PrintAll: print("Unit of electric field E0_GL (A0*f_GL): "+str(self.E0_GL)) 
+        if 'e_amp' in kwargs_list or PrintAll: print("|E0| of light: "+str(self.E0)) #  * ureg(self.E_field_units)
+        if 'e0i' in kwargs_list or PrintAll: print("Value of dimentionless |E0|: "+str(self.E0i))
+        if 'b_em_inplane' in kwargs_list or PrintAll: print("In-plane |B0| of light (|E0|/c): "+str(self.B_EM_inplane))
+        if 'a_em_inplane' in kwargs_list or PrintAll: print("In-plane |A0| of light (|E0|/w): "+str(self.A_EM_inplane))
 #         if 'tau_GL' or 'all' in kwargs_list: print("Check ratio of 2pi|A0|/|B0|: "+str(2*np.pi*A0/B0)+"\n")
-        if 'Bz_max' in kwargs_list or PrintAll: print("|Bz| of light: "+str(self.Bz_max * ureg(self.field_units)))
-        # if 'p' in kwargs_list or PrintAll: print("Degree of LG mode (p): "+str(self.p))
-        # if 'l' in kwargs_list or PrintAll: print("Order of LG mode (l): "+strself.l))
-        # if 's' in kwargs_list or PrintAll: print("Spin number (s): "+str(self.s))
+        if 'bz_max' in kwargs_list or PrintAll: print("|Bz| of light: "+str(self.Bz_max * ureg(self.field_units)))
         if 'phi0_t' in kwargs_list or PrintAll: print("Initial phase of time (phi0_t): "+str(self.phi0_t))
         if 'phi0_xy' in kwargs_list or PrintAll: print("Initial azimuthal angle (phi0_xy): "+str(self.phi0_xy))
+        if 'p' in kwargs_list or PrintAll: print("Quantum number of radial order (p): "+str(self.p))
+        if 'l' in kwargs_list or PrintAll: print("Quantum number of orbital angular momentum (l): "+str(self.l))
+        if 's' in kwargs_list or PrintAll: print("Quantum number of spin angular momentum (s): "+str(self.s))
         # if 'polarization_modulation' in kwargs_list or PrintAll: print("Polarization modulation (T/F): "+str(self.polarization_modulation))
         if PrintAll: print(" ")
         if PrintAll: print("[7] Others")
@@ -609,7 +643,6 @@ class input_value:
         if take_real: return np.real(Ex)/self.E0i, np.real(Ey)/self.E0i
         else:         return Ex/self.E0i, Ey/self.E0i
 
-
     def set_state(self, **kwargs):
         markFreq = []
         for k, v in kwargs.items():
@@ -624,7 +657,7 @@ class input_value:
         rn_resistivity = self.resistivity* ureg(self.resistivity_units)
         rho_conductivity = (1/rn_resistivity).to('1 / ohm / '+self.length_units)
         self.conductivity = rho_conductivity.to('1 / ('+self.resistivity_units+')').magnitude # Updated value
-        self.disorder_epsilon = 1/self.temperature-1 # Updated value
+        self.disorder_epsilon = 1 # 1/self.temperature-1 # Updated value. Not allowed to be updated,
         xi_coherent = self.xi * ureg(self.length_units)
         lambdaL = self.london_lambda * ureg(self.length_units)
         d_thickness = self.thickness * ureg(self.length_units)
@@ -648,14 +681,16 @@ class input_value:
         self.Bc  = (mu_0*self.Hc).to(self.field_units)
         self.A0 = (xi_coherent*self.Bc2)
         self.J0 = (4*xi_coherent*self.Bc2/mu_0/lambdaL**2).to(f"{self.current_units}/{self.length_units}^2")
-        keyword_list = ['linear_x', 'linear_y', 'x', 'y']
-        if self.light_source_type.lower() in keyword_list:
-            phi0_t, phi0_xy, polarization_modulation, output_file_head = light_state_control_LinearGauss(self.light_source_type)
+        keyword_list = ['_l_x','_l_y','_c_r','_c_l']
+        if self.light_source_type[:2].lower()=='lg' and self.light_source_type[-4:].lower() in keyword_list:
+            p, l, s, phi0_t, phi0_xy, polarization_modulation, output_file_head = light_state_control_LaguerreGauss(keyword_of_state=self.light_source_type)
+            self.p = p
+            self.l = l
+            self.s = s
             self.phi0_t = phi0_t
             self.phi0_xy = phi0_xy
             self.polarization_modulation = polarization_modulation
             self.output_file_head = output_file_head
-        
         if markFreq == 'f_EM':
             self.w_EM = f_EM*(2*np.pi)
             self.f_EM = f_EM
@@ -670,12 +705,59 @@ class input_value:
         B0_EM = (1/self.c) * ureg(self.field_units) # Output value to TDGL detedmined by unit
         A0_EM = (1/self.w_EM) * ureg(f"{self.field_units} * {self.length_units}") # Output value to TDGL detedmined by unit
         E0_EM = B0_EM * speed_of_light # Output value to TDGL detedmined by unit
-        E0i = self.E_amp/(E0_EM.to(self.E_field_units)).magnitude # From E_amp with "E_field_units" to unitless TDGL
-        self.E0i = E0i # Updated value
+        self.E0_GL = self.A0 * self.f_GL * ureg('1/'+self.time_units) # Output value to TDGL detedmined by unit
+        self.E0 = (self.E_amp * self.E0_GL).to(self.E_field_units) # Input amplitude of electric field
+        self.E0i = self.E_amp # Updated value
         # * ureg("1/angular_freq_units").to("time_units").magnitude
         self.lambda_EM = (speed_of_light * self.tau_EM_unit * ureg(self.time_units).to("s")).to(self.length_units).magnitude
-        self.B_EM_inplane = E0i*B0_EM
-        self.A_EM_inplane = E0i*A0_EM
+        self.B_EM_inplane = self.E0i*B0_EM
+        self.A_EM_inplane = self.E0i*A0_EM
+
+def printTAB(self,*,figsize=(5,2.5),dpi=100,fontsize=10,tab_scale=(1.5,2),round_num=2) -> plt.Figure:
+        eps = 1-self.temperature
+        fig, axs = plt.subplots(2,1,figsize=figsize,dpi=dpi)
+    
+        collabel=("$\\xi_0$\n ("+self.length_units+")", 
+                  "$\\lambda_{L,0}$ or $\\Gamma$\n ("+self.length_units+")", 
+                  "$r_n=1/\\rho$\n ("+self.resistivity_units+")",
+                  "$\\tau_{GL,0}$\n ("+self.time_units+")",
+                  "$\\omega_{GL,0}/2\\pi$\n ("+self.angular_freq_units+")",
+                  "$\\xi_0/\\tau_{GL,0}$\n ("+self.length_units+'/'+self.time_units+")",)
+        clust_data = ([round(self.xi*np.sqrt(eps),round_num),
+                      round(max([self.london_lambda,self.pearl_lambda])*np.sqrt(eps),round_num),
+                      round(self.resistivity,round_num),
+                      round(self.tau*eps,round_num),
+                      round(self.f_GL/eps,round_num),
+                      round((self.xi*np.sqrt(eps))/(self.tau*eps),round_num)],)
+        axs[0].axis('off')
+        axs[0].set_title('Temperature: '+str(0)+' $T_c$',fontsize=fontsize,loc='left')
+        # axs[0].set_fontsize(fontsize)
+        TAB = axs[0].table(cellText=clust_data,colLabels=collabel,loc='center',fontsize=fontsize)
+        # TAB.axis('off')
+        TAB.scale(tab_scale[0], tab_scale[1])
+
+        collabel=("$\\xi(T)$\n ("+self.length_units+")", 
+                  "$\\lambda_{L}(T)$ or $\\Gamma(T)$\n ("+self.length_units+")", 
+                  "$r_n=1/\\rho$\n ("+self.resistivity_units+")",
+                  "$\\tau_{GL}(T)$\n ("+self.time_units+")",
+                  "$\\omega_{GL}(T)/2\\pi$\n ("+self.angular_freq_units+")",
+                  "$\\xi(T)/\\tau_{GL}(T)$\n ("+self.length_units+'/'+self.time_units+")",)
+        clust_data = ([round(self.xi,round_num),
+                      round(max([self.london_lambda,self.pearl_lambda]),round_num),
+                      round(self.resistivity,round_num),
+                      round(self.tau,round_num),
+                      round(self.f_GL,round_num),
+                      round(self.xi/self.tau,round_num)],)
+        axs[1].axis('off')
+        TAB = axs[1].set_title('Temperature: '+str(self.temperature)+' $T_c$, $\\epsilon=1-T/T_c$='+str(round(1-self.temperature,round_num)),fontsize=fontsize,loc='left')
+        TAB = axs[1].table(cellText=clust_data,colLabels=collabel,loc='center',fontsize=fontsize)
+        TAB.scale(tab_scale[0], tab_scale[1])
+
+        plt.show()
+        return fig, axs
+
+  
+
         
 def dump(obj):
   for attr in dir(obj):

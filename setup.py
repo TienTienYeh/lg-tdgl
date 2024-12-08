@@ -6,7 +6,7 @@
 
 from setuptools import find_packages, setup
 
-DESCRIPTION = "LGTDGL: ????? Time-dependent Ginzburg-Landau in Python."
+DESCRIPTION = "LGTDGL: Structured light induced vorticity in superconductors: Laguerre-Gaussian beam."
 LONG_DESCRIPTION = __doc__
 
 NAME = "lgtdgl"
