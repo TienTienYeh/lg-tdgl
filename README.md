@@ -20,7 +20,7 @@ This script, `LG-TDGL`, builds upon the series of works titled ''*Structured lig
 In this notebook, we showcase an example of a dynamics of superconducting vortices induced by Laguerre-Gaussian beam, and demonstrate the results for the light-imprinted superflow in reference.<br>
 <br>
 
-***
+--
 References:<br>
 [1] This code requires the `pyTDGL` environment. See the documentation: https://py-tdgl.readthedocs.io/en/latest/, and publication DOI: https://doi.org/10.1016/j.cpc.2023.108799. <br>
 [2] ''*Structured light and induced vorticity in superconductors I: Linearly polarized light.*'' DOI: https://arxiv.org/abs/2407.15834. <br>
@@ -52,13 +52,15 @@ pip install -e ".[dev,docs]"
 
 ### Authors
 
-- Primary author and maintainer: [@TienTienYeh](https://github.com/TienTienYeh/).
+- Authors of works of *Structured light and induced vorticity in superconductors*: Tien-Tien Yeh, Hennadii Yerzhakov, Logan Bishop-Van Horn, Srinivas Raghu, Alexander Balatsky, 
+- Primary author and maintainer of GitHub: [@TienTienYeh](https://github.com/TienTienYeh/).
 
-### Citing `pyTDGL`
+### Citing `LG-TDGL`
 
-`LG-TDGL` is described in the following paper:
+`LG-TDGL` is described in the following papers:
 
->* Structured light induced vorticity in superconductors I: Linearly polarized light (unpublished)
+>* ''*Structured light and induced vorticity in superconductors I: Linearly polarized light.*'' DOI: https://arxiv.org/abs/2407.15834. 
+>* ''*Structured light and induced vorticity in superconductors II: Quantum Print with Laguerre-Gaussian beam.*'' DOI: https://arxiv.org/abs/2412.00935. 
 
 If you use `LG-TDGL` in your research, please cite the paper linked above.
 
