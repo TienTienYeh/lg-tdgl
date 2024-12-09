@@ -345,11 +345,11 @@ def E2Bv(xv,yv,Ex,Ey,Bz_constant,c,w):
     return Bx, By, Bz #.to(f"{field_units}").magnitude
 
 def find_max_Bz(P):
-    Ex, Ey = P.E_input_frame(0,take_real=False,t_off=10/P.w_GL)
+    Ex, Ey = P.E_input_frame(0,take_real=False)
     Bx, By, Bz1 = E2Bv(P.Xv,P.Yv,P.E0i*Ex,P.E0i*Ey,0,P.c,P.w_GL)
-    Ex, Ey = P.E_input_frame(2*np.pi/4/P.w_GL,take_real=False,t_off=10/P.w_GL)
+    Ex, Ey = P.E_input_frame(2*np.pi/4/P.w_GL,take_real=False)
     Bx, By, Bz2 = E2Bv(P.Xv,P.Yv,P.E0i*Ex,P.E0i*Ey,0,P.c,P.w_GL)
-    Ex, Ey = P.E_input_frame(2*np.pi/2/P.w_GL,take_real=False,t_off=10/P.w_GL)
+    Ex, Ey = P.E_input_frame(2*np.pi/2/P.w_GL,take_real=False)
     Bx, By, Bz3 = E2Bv(P.Xv,P.Yv,P.E0i*Ex,P.E0i*Ey,0,P.c,P.w_GL)
     return max([abs(np.real(Bz1)).max(), abs(np.real(Bz2)).max(), abs(np.real(Bz3)).max()]) + P.constant_Bz
 
