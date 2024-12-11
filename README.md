@@ -86,9 +86,9 @@ The documentation for `pyTDGL` can be found at [py-tdgl.readthedocs.io](https://
 
 `pyTDGL` requires `python` `3.8`, `3.9`, `3.10`, or `3.11`. We recommend installing `pyTDGL` in a [`conda` environment](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html), e.g.
 
-<!-- ```bash
+```bash
 conda create --name tdgl python="3.10"
 conda activate tdgl
-``` -->
+```
 
 
