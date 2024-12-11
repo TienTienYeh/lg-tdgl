@@ -2,16 +2,12 @@
 
 ![testtesttest](docs/logo.png)
 
-Time-dependent Ginzburg-Landau in Python
+Structured light and induced vorticity in superconductors
 
 #![PyPI](https://img.shields.io/pypi/v/tdgl)
-#![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/loganbvh/py-tdgl/lint-and-test.yml?branch=main)
-#[![Documentation Status](https://readthedocs.org/projects/py-tdgl/badge/?version=latest)](https://py-tdgl.readthedocs.io/en/latest/?badge=latest)
-#[![codecov](https://codecov.io/gh/loganbvh/py-tdgl/branch/main/graph/badge.svg?token=VXdxJKP6Ag)](https://codecov.io/gh/loganbvh/py-tdgl)
-#![GitHub](https://img.shields.io/github/license/loganbvh/py-tdgl)
-#[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-#[![DOI](https://zenodo.org/badge/535746543.svg)](https://zenodo.org/badge/latestdoi/535746543)
-
+#![GitHub](https://img.shields.io/github/license/TienTienYeh/lg-tdgl)
+[![arXiv](https://img.shields.io/badge/arXiv-2407.15834-b31b1b.svg?style=plastic)](https://arxiv.org/abs/2407.15834)
+[![arXiv](https://img.shields.io/badge/arXiv-2412.00935-b31b1b.svg?style=plastic)](https://arxiv.org/abs/2412.00935)
 
 ## Motivation
 
@@ -90,9 +86,9 @@ The documentation for `pyTDGL` can be found at [py-tdgl.readthedocs.io](https://
 
 `pyTDGL` requires `python` `3.8`, `3.9`, `3.10`, or `3.11`. We recommend installing `pyTDGL` in a [`conda` environment](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html), e.g.
 
-```bash
+<!-- ```bash
 conda create --name tdgl python="3.10"
 conda activate tdgl
-```
+``` -->
 
 
