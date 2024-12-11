@@ -6,8 +6,8 @@ Structured light and induced vorticity in superconductors
 
 #![PyPI](https://img.shields.io/pypi/v/tdgl)
 #![GitHub](https://img.shields.io/github/license/TienTienYeh/lg-tdgl)
-[![arXiv](https://img.shields.io/badge/arXiv-2407.15834-b31b1b.svg?style=plastic)](https://arxiv.org/abs/2407.15834)
-[![arXiv](https://img.shields.io/badge/arXiv-2412.00935-b31b1b.svg?style=plastic)](https://arxiv.org/abs/2412.00935)
+#[![arXiv](https://img.shields.io/badge/arXiv-2407.15834-b31b1b.svg?style=plastic)](https://arxiv.org/abs/2407.15834)
+#[![arXiv](https://img.shields.io/badge/arXiv-2412.00935-b31b1b.svg?style=plastic)](https://arxiv.org/abs/2412.00935)
 
 ## Motivation
 
