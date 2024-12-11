@@ -771,7 +771,7 @@ def plot_polarization(X,Y,E_x,E_y,*,E0i:float=1.0,title:str='',figsize:(3, 3),sc
     plt.xlabel('x ($\mu$m)')
     plt.ylabel('y ($\mu$m)')
 
-def plot_EM(X,Y,E_x,E_y,B_z,*,E0i:float=1.0,title:str='',figsize:(6, 3),scale:float=12,dpi:float=100,take_Bz_range:bool=False,width_quiver:float=0.01):
+def plot_EM(X,Y,E_x,E_y,B_z,*,E0i:float=1.0,title:str='',figsize:(6, 3),scale:float=12,dpi:float=100,width_quiver:float=0.01):
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=figsize,dpi=dpi) #constrained_layout=True,
     fig.suptitle(title)
     ax1.quiver(X,Y,E_x/E0i,E_y/E0i,scale=scale, scale_units='x',width=width_quiver*abs(X[2]-X[1]))
@@ -780,8 +780,7 @@ def plot_EM(X,Y,E_x,E_y,B_z,*,E0i:float=1.0,title:str='',figsize:(6, 3),scale:fl
     # ax1.text(min(X)*.95, max(Y)*.85, '$|E_{0}|$: '+str(E0i), horizontalalignment='left', fontsize='large')
     ax1.set_aspect("equal")
     Xv, Yv = np.meshgrid(X, Y)
-    if take_Bz_range: Bzmax, Bzmin = [find_max_Bz(Xv,Yv,E0i,constant_Bz,c,w_input), -find_max_Bz(Xv,Yv,E0i,constant_Bz,c,w_input)]
-    else: Bzmax, Bzmin = [B_z.max(), B_z.min()]
+    Bzmax, Bzmin = [B_z.max(), B_z.min()]
     contour_Bz = ax2.contourf(Xv, Yv, B_z, levels=50, linewidths=0.0, cmap="PRGn",vmin=Bzmin,vmax=Bzmax)
     cbar = plt.colorbar(contour_Bz)
     cbar.set_label('Normalized $\Phi_{B}$')

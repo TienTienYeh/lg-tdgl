@@ -69,9 +69,9 @@ def create_animation_withEMwave(
     logger: Optional[Logger] = None,
     figure_kwargs: Optional[Dict[str, Any]] = None,
     writer: Union[str, animation.MovieWriter, None] = None,
-    quiver_scale = 10,
-    quiver_mesh_n = 20,
-    width_quiver = 0.01,
+    # quiver_scale = 10,
+    # quiver_mesh_n = 20,
+    # width_quiver = 0.01,
 ) -> animation.FuncAnimation:
     """Generates, and optionally saves, and animation of a TDGL simulation.
 
@@ -165,8 +165,7 @@ def create_animation_withEMwave(
             ti = dict(input_file['data'][str(1)].attrs)['time']
             E_x, E_y = par.E_input_frame(ti,take_real=False)
             B_x, B_y, B_z = E2Bv(Xv,Yv,par.E0i*E_x,par.E0i*E_y,par.constant_Bz,par.c,par.w_EM)
-            # Bzmax, Bzmin = [find_max_Bz(par), -find_max_Bz(par)]
-            Bzmax, Bzmin = par.Bz_max, -par.Bz_max
+            Bzmax, Bzmin = par.Bz_max, -par.Bz_max # [find_max_Bz(par), -find_max_Bz(par)]
 
             for quantity, ax in zip(quantities, axes.flat):
                 ax: plt.Axes
@@ -226,7 +225,7 @@ def create_animation_withEMwave(
                         vmax=Bzmax,
                     )
                     cbar = plt.colorbar(collection)
-                    cbar.set_label('$B_{z}$ ['+par.field_units+']')
+                    cbar.set_label('$B$')#' ['+par.field_units+']')
                     ax.set_aspect("equal")
                     ax.set_title('$B_{z}$ ')
                     ax.set_xlim(xlim)
@@ -345,9 +344,9 @@ def make_video_from_solution(
                 axis_labels = True,
                 output_file=output_file,
                 dpi=dpi,
-                quiver_scale=quiver_scale,
-                quiver_mesh_n=quiver_mesh_n,
-                width_quiver=width_quiver,
+                # quiver_scale=quiver_scale,
+                # quiver_mesh_n=quiver_mesh_n,
+                # width_quiver=width_quiver,
             )
             video = anim.to_html5_video()
         return HTML(video)
