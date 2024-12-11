@@ -200,7 +200,7 @@ def create_animation_withEMwave(
                         Xv,
                         Yv,
                         np.real(E_x),
-                        np.real(E_y)
+                        np.real(E_y),
                         scale=par.quiver_scale,
                         scale_units='x',
                         width=par.width_quiver*abs(X[2]-X[1]),
