@@ -164,8 +164,9 @@ def create_animation_withEMwave(
             Xv, Yv = np.meshgrid(X, Y)
             ti = dict(input_file['data'][str(1)].attrs)['time']
             E_x, E_y = par.E_input_frame(ti,take_real=False)
-            B_x, B_y, B_z = E2Bv(Xv,Yv,E_x,E_y,par.constant_Bz,par.c,par.w_EM)
-            Bzmax, Bzmin = [find_max_Bz(par), -find_max_Bz(par)]
+            B_x, B_y, B_z = E2Bv(Xv,Yv,par.E0i*E_x,par.E0i*E_y,par.constant_Bz,par.c,par.w_EM)
+            # Bzmax, Bzmin = [find_max_Bz(par), -find_max_Bz(par)]
+            Bzmax, Bzmin = par.Bz_max, -par.Bz_max
 
             for quantity, ax in zip(quantities, axes.flat):
                 ax: plt.Axes
@@ -198,8 +199,8 @@ def create_animation_withEMwave(
                     collection = ax.quiver(
                         Xv,
                         Yv,
-                        np.real(E_x)/par.E0i,
-                        np.real(E_y)/par.E0i,
+                        np.real(E_x),
+                        np.real(E_y)
                         scale=par.quiver_scale,
                         scale_units='x',
                         width=par.width_quiver*abs(X[2]-X[1]),
