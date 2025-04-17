@@ -79,6 +79,7 @@ If you use `LG-TDGL` in your research, please cite the paper linked above.
 
 ### Acknowledgments
 
+This work was supported by US DOE Office of Science award DC-SC0025580.
 This work is based on the `pyTDGL` developed by Logan Bishop-Van Horn.
 The documentation for `pyTDGL` can be found at [py-tdgl.readthedocs.io](https://py-tdgl.readthedocs.io/en/latest/).
 
@@ -90,5 +91,6 @@ The documentation for `pyTDGL` can be found at [py-tdgl.readthedocs.io](https://
 conda create --name tdgl python="3.10"
 conda activate tdgl
 ```
+
 
 
