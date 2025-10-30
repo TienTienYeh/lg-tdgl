@@ -61,19 +61,35 @@ pip install -e ".[dev,docs]"
 If you use `LG-TDGL` in your research, please cite the paper linked above.
 
     % BibTeX citation
-
-    @article{yeh2024structured,
-    title={Structured light and induced vorticity in superconductors I: Linearly polarized light},
-    author={Yeh, Tien-Tien and Yerzhakov, Hennadii and Horn, Logan Bishop-Van and Raghu, Srinivas and Balatsky, Alexander},
-    journal={arXiv preprint arXiv:2407.15834},
-    year={2024}
+    
+    @article{yeh2025quantum_I,
+    title = {Quantum printing and induced vorticity in superconductors I: Linearly polarized light},
+    author = {Yeh, Tien-Tien and Yerzhakov, Hennadii and Bishop-Van Horn, Logan and Raghu, Srinivas and Balatsky, Alexander},
+    journal = {Phys. Rev. Res.},
+    volume = {7},
+    issue = {4},
+    pages = {043111},
+    numpages = {18},
+    year = {2025},
+    month = {Oct},
+    publisher = {American Physical Society},
+    doi = {10.1103/k9m4-h474},
+    url = {https://link.aps.org/doi/10.1103/k9m4-h474}
     }
     
-    @article{yeh2024structured,
-    title={Structured light and induced vorticity in superconductors II: Quantum Print with Laguerre-Gaussian beam},
-    author={Yeh, Tien-Tien and Yerzhakov, Hennadii and Horn, Logan Bishop-Van and Raghu, Srinivas and Balatsky, Alexander},
-    journal={arXiv preprint arXiv:2412.00935},
-    year={2024}
+    @article{yeh2025quantum_II,
+    title = {Quantum printing and induced vorticity in superconductors II: Laguerre-Gaussian beam},
+    author = {Yeh, Tien-Tien and Yerzhakov, Hennadii and Horn, Logan Bishop-Van and Raghu, Srinivas and Balatsky, Alexander},
+    journal = {Phys. Rev. Res.},
+    volume = {7},
+    issue = {4},
+    pages = {043112},
+    numpages = {23},
+    year = {2025},
+    month = {Oct},
+    publisher = {American Physical Society},
+    doi = {10.1103/dqv7-w2w4},
+    url = {https://link.aps.org/doi/10.1103/dqv7-w2w4}
     }
 
 
